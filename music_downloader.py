@@ -7,7 +7,7 @@ import music_tag # to add meta data
 links_to_download = ["http://localhost/vpage_template.php?video_id=U0DvnaPmyvBGGQp1689570294E&x=223&y=125"]
 
 download_options = {
-    # ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
+    # See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
     'postprocessors': [{  # Extract audio using ffmpeg
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
@@ -17,3 +17,4 @@ download_options = {
 
 with YoutubeDL(download_options) as ydl:
     error_code = ydl.download(links_to_download)
+
