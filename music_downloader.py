@@ -1,5 +1,6 @@
 from yt_dlp import YoutubeDL # to download videos
 import ffmpeg # to extract mp3 from videos
+import music_tag # to add meta data
 
 # testing -- to download a video and extract audio
 
