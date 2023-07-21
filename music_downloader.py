@@ -19,7 +19,12 @@ download_options = {
 with YoutubeDL(download_options) as ydl:
     error_code = ydl.download(links_to_download)
 """
-
+"""
+safeguards to add:
+download cannot commence if there are any mp3 files in the working directory
+a link cannot be entered more than once
+metadata cannot be added if the number of mp3 files in the working directory does not match the number of links
+"""
 run_status = "running"
 # create the download directory if it does not exist
 current_working_directory = os.getcwd() #the current working directory the script is being run from
