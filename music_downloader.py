@@ -22,7 +22,6 @@ with YoutubeDL(download_options) as ydl:
 """
 safeguards to add:
 download cannot commence if there are any mp3 files in the working directory
-a link cannot be entered more than once
 metadata cannot be added if the number of mp3 files in the working directory does not match the number of links
 """
 run_status = "running"
@@ -107,15 +106,54 @@ while (run_status == "running"):
             
             with YoutubeDL(download_options) as ydl:
                 error_code = ydl.download(links_to_download)
-
-            """
-            to do next
-            get list of all mp3 files in the current working directory
-            sort from first created to last created
-            loop through file list and apply metadata, also rename -> the file list should be in the same order as the metadata list
-            move all mp3 files into the download directory
-            """
-
+            
+            # apply metadata
+            ## list all mp3 files, with the first file downloaded at the top of list
+            ## get list of all files in the current working directory
+            all_file_in_current_directory = os.listdir(current_working_directory)
+            ## get all the mp3 files into a list
+            list_of_mp3_files = [] # a list all mp3 files, matching with file_creation_time
+            file_creation_time =[] # the associated file creation time of all mp3 files, matching with list_of_mp3_files
+            for file in all_file_in_current_directory:
+                # get the file extention
+                path_to_file = os.path.join(current_working_directory,file)
+                ## split the file name and the file extention
+                file_name, file_extension = os.path.splitext(path_to_file)
+                # if the file extention is ".mp3", add the file path to the list of mp3 files, as well as the file creation time
+                file_extension_to_find = ".mp3" # the file extention to look for
+                if (file_extension == file_extension_to_find):
+                    # add the file to the mp3 list
+                    list_of_mp3_files.append(path_to_file)
+                    # add the file creation time
+                    file_creation_time.append(os.path.getctime(path_to_file))
+                    pass
+            # apply metadata
+            ## sort the creation date list from smallest to largest
+            sorted_file_creation_times = sorted(file_creation_time)
+            ## loop through the file creation times, find the file, then apply metadata, and move the file to download directory
+            for x in range(0, len(sorted_file_creation_times)):
+                # find the mp3 file with the specified creation date
+                find_this_creation_date = sorted_file_creation_times[x]
+                for y in range(0,len(list_of_mp3_files)):
+                    if (file_creation_time[y] == find_this_creation_date):
+                        # apply metadata, using music-tag
+                        file_to_open = list_of_mp3_files[y]
+                        edit_file = music_tag.load_file(file_to_open) # open the file
+                        # the outer loop index should match up with the indexes of the metadata lists
+                        # apply track title
+                        edit_file["tracktitle"] = track_titles[x]
+                        # apply track artist
+                        edit_file["artist"] = track_artist[x]
+                        # apply track album
+                        edit_file["album"] = track_albums[x]
+                        # save metadata
+                        edit_file.save()
+                        # move and rename file to download directory
+                        source_file_path = file_to_open
+                        new_file_name = track_titles[x] # also the title of the track
+                        move_destination = os.path.join(current_working_directory,download_directory,(new_file_name + ".mp3"))
+                        os.rename(source_file_path, move_destination)
+                    pass
             # clear the links
             links_to_download.clear()
             track_titles.clear()
